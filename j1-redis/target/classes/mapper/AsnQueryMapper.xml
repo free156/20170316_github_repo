@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.j1.mai.dao.AsnQueryMapper">
+       <resultMap id="asnQueryMapper" type="com.j1.mai.Entity.AsnEntity">
+              <result column="ASN_ID" property="asnId" />
+              <result column="PDS_ID" property="pdsId" />
+              <result column="BUYER_PLANT_CODE" property="buyerPlantCode" />
+              <result column="SUPPLIER_PLANT_CODE" property="supplierPlantCode" />
+              <result column="ASN_NO" property="asnNo" />
+
+              <result column="INVOICE_NO" property="invoiceNo" />
+              <result column="ASN_PUBLISH_DATE" property="asnPublishDate" />
+              <result column="CREATED_DATE" property="createDate" />
+              <result column="CREATED_BY" property="createBy" />
+              <result column="STATUS" property="status" />
+              <result column="DELIVERY_DATE" property="deliveryDate" />
+       </resultMap>
+       <select id="asnQuery" resultMap="asnQueryMapper" parameterType="int" >
+              select * from TRT_ASN_HEADER where asn_id= #{asnId}
+       </select>
+
+       <insert id="saveAsn" parameterType="com.j1.mai.Entity.AsnEntity">
+              INSERT INTO TRT_ASN_HEADER
+              insert into TRT_ASN_HEADER (ASN_ID, PDS_ID, BUYER_PLANT_CODE, SUPPLIER_PLANT_CODE, ASN_NO, INVOICE_NO, ASN_PUBLISH_DATE, CREATED_DATE, CREATED_BY, STATUS, DELIVERY_DATE, ROWID)
+values (select SEQ_TRT_ASN_HEADER.nextval from dual, 131, 'TRT', 'SL701', 'SL701A-140921-07-15', 'wwwwwwwww', to_date('21-10-2016 16:40:40', 'dd-mm-yyyy hh24:mi:ss'), to_date('21-10-2016 16:40:40', 'dd-mm-yyyy hh24:mi:ss'), 'TRTSP3', 'Sent', to_date('21-09-2016 15:20:00', 'dd-mm-yyyy hh24:mi:ss'), 'AAAc20AAPAABQcDAAA');
+
+       </insert>
+
+</mapper>

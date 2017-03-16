@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
+	   default-autowire="byName"><!-- Notice:must be autowire:byName -->
+	<!-- ================================ ORACLE ======================================== -->
+	<!-- 配置oracle dbcp数据源 <bean id="oracleDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="org.logicalcobwebs.proxool.ProxoolDriver" 
+		/> <property name="url" value="proxool.j1soa-order-oracle" /> </bean> -->
+
+
+	<!-- 使用JDBC事物 -->
+	<bean id="oracleTransactionManager"
+		  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="oracleDataSource" />
+	</bean>
+
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="oracleTransactionManager" />
+
+	<!-- 配置SQLSession工厂 -->
+	<bean id="oracleSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="oracleDataSource" />
+		<property name="configLocation" value="classpath:config/mybatis-config.xml" />
+		<!--<property name="typeAliasesPackage" value="com.j1.mai.dao.**" />-->
+		<property name="mapperLocations" value="classpath:mapper/*.xml" />
+	</bean>
+
+	<!-- 配置扫描器 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="oracleSqlSessionFactory" />
+		<!-- 扫描me.gacl.dao这个包以及它的子包下的所有映射接口类 -->
+		<property name="basePackage" value="com.j1.mai.dao" />
+	</bean>
+
+	<!-- AOP配置事物 -->
+	<tx:advice id="oracleTransactionAdvice" transaction-manager="oracleTransactionManager">
+		<tx:attributes>
+			<tx:method name="query*" read-only="true" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="rollBack*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 配置AOP切面 -->
+	<aop:config>
+		<aop:pointcut id="oracleTransactionPointCut"
+					  expression="execution(* com.j1.mai.dao.*.*(..))" />
+		<aop:advisor pointcut-ref="oracleTransactionPointCut"
+					 advice-ref="oracleTransactionAdvice" />
+	</aop:config>
+	<!-- ================================ ORACLE ======================================== -->
+
+	<!-- ================================ MYSQL ======================================== -->
+	<!--&lt;!&ndash; <bean id="mysqlDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> &ndash;&gt;
+	&lt;!&ndash; <property name="driverClassName" value="org.logicalcobwebs.proxool.ProxoolDriver"
+		/> &ndash;&gt;
+	&lt;!&ndash; <property name="url" value="proxool.j1soa-order-mysql" /> &ndash;&gt;
+	&lt;!&ndash; </bean> &ndash;&gt;
+
+	<bean id="mysqlTransactionManager"
+		  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="mysqlDataSource" />
+	</bean>
+
+	&lt;!&ndash; 使用annotation注解方式配置事务 &ndash;&gt;
+	<tx:annotation-driven transaction-manager="mysqlTransactionManager" />
+
+	&lt;!&ndash; 配置SQLSession工厂 &ndash;&gt;
+	<bean id="mysqlSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="mysqlDataSource" />
+		<property name="configLocation" value="classpath:config/mybatis-config.xml" />
+		<property name="typeAliasesPackage" value="com.j1.soa.**.mysql.dao.**" />
+	</bean>
+
+	&lt;!&ndash; SQL调用方式二：通过定义Mapper类，直接通过方法名调用sql &ndash;&gt;
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="mysqlSqlSessionFactory" />
+		<property name="basePackage" value="com.j1.soa.**.mysql.dao.**" />
+	</bean>
+
+	&lt;!&ndash; AOP配置事物 &ndash;&gt;
+	<tx:advice id="mysqlTransactionAdvice" transaction-manager="mysqlTransactionManager">
+		<tx:attributes>
+			<tx:method name="query*" read-only="true" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="rollBack*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+
+	&lt;!&ndash; 配置AOP切面 &ndash;&gt;
+	<aop:config>
+		<aop:pointcut id="mysqlTransactionPointCut"
+					  expression="execution(* com.j1.soa..*.mysql.service.*.*(..))" />
+		<aop:advisor pointcut-ref="mysqlTransactionPointCut"
+					 advice-ref="mysqlTransactionAdvice" />
+	</aop:config>-->
+	<!-- ================================ MYSQL ======================================== -->
+</beans>
